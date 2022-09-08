@@ -669,10 +669,10 @@ static ShaderNode *add_node(Scene *scene,
         scatter->set_phase_function(CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID);
         break;
       case BL::ShaderNodeVolumeScatter::phase_function_MEI:
-        scatter->set_phase_function(CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID);
+        scatter->set_phase_function(CLOSURE_VOLUME_MEI_ID);
         break;
       case BL::ShaderNodeVolumeScatter::phase_function_RAYLEIGH:
-        scatter->set_phase_function(CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID);
+        scatter->set_phase_function(CLOSURE_VOLUME_RAYLEIGH_ID);
         break;
     }
 

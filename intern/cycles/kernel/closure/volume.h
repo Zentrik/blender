@@ -134,6 +134,13 @@ ccl_device float3 volume_phase_eval(ccl_private const ShaderData *sd,
                                     ccl_private float *pdf)
 {
   return volume_henyey_greenstein_eval_phase(svc, sd->I, omega_in, pdf);
+  //   float3 eval;
+
+  //   switch (svc->type) {
+  //     case CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID:
+  //       eval = volume_henyey_greenstein_eval_phase(svc, sd->I, omega_in, pdf);
+  //       break;
+  //   }
 }
 
 ccl_device int volume_phase_sample(ccl_private const ShaderData *sd,
@@ -156,6 +163,25 @@ ccl_device int volume_phase_sample(ccl_private const ShaderData *sd,
                                          &domega_in->dx,
                                          &domega_in->dy,
                                          pdf);
+  // int label;
+
+  // switch (svc->type) {
+  //   case CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID:
+  //     label = volume_henyey_greenstein_sample(svc,
+  //                                             sd->I,
+  //                                             sd->dI.dx,
+  //                                             sd->dI.dy,
+  //                                             randu,
+  //                                             randv,
+  //                                             eval,
+  //                                             omega_in,
+  //                                             &domega_in->dx,
+  //                                             &domega_in->dy,
+  //                                             pdf);
+  //     break;
+  // }
+
+  // return label;
 }
 
 /* Volume sampling utilities. */

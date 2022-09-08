@@ -3387,7 +3387,7 @@ void ScatterVolumeNode::compile(SVMCompiler &compiler)
 void ScatterVolumeNode::compile(OSLCompiler &compiler)
 {
   closure = phase_function;
-  // compiler.parameter(this, "phase_function")
+  compiler.parameter(this, "phase_function");
   compiler.add(this, "node_scatter_volume");
 }
 
