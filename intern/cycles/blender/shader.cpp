@@ -664,11 +664,7 @@ static ShaderNode *add_node(Scene *scene,
 
     ScatterVolumeNode *scatter = graph->create_node<ScatterVolumeNode>();
 
-    // scatter->set_phase_function_type(
-    //     (NodeVolumeScatterType)b_scatter_node.phase_function());
-
     switch (b_scatter_node.phase_function()) {
-          // scatter->set_phase_function(CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID);
       case BL::ShaderNodeVolumeScatter::phase_function_HENYEY:
         scatter->set_phase_function(CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID);
         break;

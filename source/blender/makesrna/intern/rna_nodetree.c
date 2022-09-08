@@ -4711,17 +4711,17 @@ static const EnumPropertyItem node_volume_scatter_method_items[] = {
      "HENYEY",
      0,
      "Henyey-Greenstein",
-     "todobot"},
+     "todo"},
     {VOLUME_SCATTER_MEI,
      "MEI",
      0,
      "Mei",
-     "todobot"},
+     "todo"},
     {VOLUME_SCATTER_RAYLEIGH,
      "RAYLEIGH",
      0,
      "Rayleigh",
-     "todobot"},
+     "todo"},
     {0, NULL, 0, NULL, NULL}};
 
 /* -- Common nodes ---------------------------------------------------------- */
@@ -6398,7 +6398,7 @@ static void def_sh_volume_scatter(StructRNA *srna)
   prop = RNA_def_property(srna, "phase_function", PROP_ENUM, PROP_NONE);
   RNA_def_property_enum_sdna(prop, NULL, "custom1");
   RNA_def_property_enum_items(prop, node_volume_scatter_method_items);
-  RNA_def_property_ui_text(prop, "Phase Function", "Phase function to use in volume (in?) scattering.");
+  RNA_def_property_ui_text(prop, "Phase Function", "Phase function to use in volume (in?) scattering");
   RNA_def_property_update(prop, NC_NODE | NA_EDITED, "rna_ShaderNode_socket_update");
 }
 
