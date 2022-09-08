@@ -1819,6 +1819,14 @@ enum {
   SHD_SUBSURFACE_RANDOM_WALK = 5,
 };
 
+/* Volume Scatter. */
+
+enum {
+  VOLUME_SCATTER_HENYEY = 0,
+  VOLUME_SCATTER_MEI = 1,
+  VOLUME_SCATTER_RAYLEIGH = 2,
+};
+
 /* blur node */
 #define CMP_NODE_BLUR_ASPECT_NONE 0
 #define CMP_NODE_BLUR_ASPECT_Y 1

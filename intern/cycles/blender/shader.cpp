@@ -660,7 +660,27 @@ static ShaderNode *add_node(Scene *scene,
     node = ao;
   }
   else if (b_node.is_a(&RNA_ShaderNodeVolumeScatter)) {
-    node = graph->create_node<ScatterVolumeNode>();
+    BL::ShaderNodeVolumeScatter b_scatter_node(b_node);
+
+    ScatterVolumeNode *scatter = graph->create_node<ScatterVolumeNode>();
+
+    // scatter->set_phase_function_type(
+    //     (NodeVolumeScatterType)b_scatter_node.phase_function());
+
+    switch (b_scatter_node.phase_function()) {
+          // scatter->set_phase_function(CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID);
+      case BL::ShaderNodeVolumeScatter::phase_function_HENYEY:
+        scatter->set_phase_function(CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID);
+        break;
+      case BL::ShaderNodeVolumeScatter::phase_function_MEI:
+        scatter->set_phase_function(CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID);
+        break;
+      case BL::ShaderNodeVolumeScatter::phase_function_RAYLEIGH:
+        scatter->set_phase_function(CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID);
+        break;
+    }
+
+    node = scatter;
   }
   else if (b_node.is_a(&RNA_ShaderNodeVolumeAbsorption)) {
     node = graph->create_node<AbsorptionVolumeNode>();

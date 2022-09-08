@@ -3362,6 +3362,12 @@ NODE_DEFINE(ScatterVolumeNode)
   SOCKET_IN_FLOAT(anisotropy, "Anisotropy", 0.0f);
   SOCKET_IN_FLOAT(volume_mix_weight, "VolumeMixWeight", 0.0f, SocketType::SVM_INTERNAL);
 
+  static NodeEnum phase_function_enum;
+  phase_function_enum.insert("henyey", CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID);
+  phase_function_enum.insert("rayleigh", CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID);
+  phase_function_enum.insert("mei", CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID);
+  SOCKET_ENUM(phase_function, "Phase Function", phase_function_enum, CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID);
+
   SOCKET_OUT_CLOSURE(volume, "Volume");
 
   return type;
@@ -3369,16 +3375,19 @@ NODE_DEFINE(ScatterVolumeNode)
 
 ScatterVolumeNode::ScatterVolumeNode() : VolumeNode(get_node_type())
 {
-  closure = CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID;
+  closure = phase_function;
 }
 
 void ScatterVolumeNode::compile(SVMCompiler &compiler)
 {
+  closure = phase_function;
   VolumeNode::compile(compiler, input("Density"), input("Anisotropy"));
 }
 
 void ScatterVolumeNode::compile(OSLCompiler &compiler)
 {
+  closure = phase_function;
+  // compiler.parameter(this, "phase_function")
   compiler.add(this, "node_scatter_volume");
 }
 

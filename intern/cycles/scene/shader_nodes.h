@@ -815,7 +815,13 @@ class ScatterVolumeNode : public VolumeNode {
  public:
   SHADER_NODE_CLASS(ScatterVolumeNode)
 
+  ClosureType get_closure_type()
+  {
+    return phase_function;
+  }
+
   NODE_SOCKET_API(float, anisotropy)
+  NODE_SOCKET_API(ClosureType, phase_function)
 };
 
 class PrincipledVolumeNode : public VolumeNode {
