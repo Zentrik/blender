@@ -34,8 +34,7 @@ static_assert(sizeof(ShaderClosure) >= sizeof(HenyeyGreensteinVolume),
  * uniform sphere. g=0 uniform diffuse-like, g=1 close to sharp single ray. */
 ccl_device float single_peaked_henyey_greenstein(float cos_theta, float g)
 {
-  return ((1.0f - g * g) * (1 + cos_theta * cos_theta) / safe_powf(1.0f + g * g - 2.0f * g * cos_theta, 1.5f)) / (2.0f + g * g) *
-         (M_1_PI_F * 0.375f);
+  return (1 + cos_theta * cos_theta) * (M_1_PI_F * 0.1875f);
 };
 
 ccl_device int volume_henyey_greenstein_setup(ccl_private HenyeyGreensteinVolume *volume)
@@ -43,7 +42,7 @@ ccl_device int volume_henyey_greenstein_setup(ccl_private HenyeyGreensteinVolume
   volume->type = CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID;
 
   /* clamp anisotropy to avoid delta function */
-  volume->g = signf(volume->g) * min(fabsf(volume->g), 1.0f - 1e-3f);
+  // volume->g = signf(volume->g) * min(fabsf(volume->g), 1.0f - 1e-3f);
 
   return SD_SCATTER;
 }
@@ -56,14 +55,9 @@ ccl_device Spectrum volume_henyey_greenstein_eval_phase(ccl_private const Shader
   float g = svc->g;
 
   /* note that I points towards the viewer */
-  if (fabsf(g) < 1e-3f) {
-    float cos_theta = dot(-I, omega_in);
-    *pdf = M_1_PI_F * 0.1875f * (1 + cos_theta * cos_theta);
-  }
-  else {
-    float cos_theta = dot(-I, omega_in);
-    *pdf = single_peaked_henyey_greenstein(cos_theta, g);
-  }
+
+  float cos_theta = dot(-I, omega_in);
+  *pdf = single_peaked_henyey_greenstein(cos_theta, g);
 
   return make_spectrum(*pdf);
 }
@@ -78,7 +72,7 @@ henyey_greenstrein_sample(float3 D, float g, float randu, float randv, ccl_priva
   if (isotropic) {
     cos_theta = (1.0f - 2.0f * randu);
     if (pdf) {
-      *pdf = M_1_PI_F * 0.1875f * (1 + cos_theta * cos_theta);
+      *pdf = (1 + cos_theta * cos_theta) * (M_1_PI_F * 0.1875f);
     }
   }
   else {
