@@ -340,7 +340,7 @@ ccl_device float volume_distance_sample(float max_t,
                                         ccl_private float3 *transmittance,
                                         ccl_private float3 *pdf)
 {
-  /* xi is [0, 1[ so log(0) should never happen, division by zero is
+  /* xi is [0, 1] so log(0) should never happen, division by zero is
    * avoided because sample_sigma_t > 0 when SD_SCATTER is set */
   float sample_sigma_t = volume_channel_get(sigma_t, channel);
   float3 full_transmittance = volume_color_transmittance(sigma_t, max_t);
