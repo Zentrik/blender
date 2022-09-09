@@ -75,10 +75,11 @@ ccl_device_inline void shader_copy_volume_phases(ccl_private ShaderVolumePhases 
     ccl_private const HenyeyGreensteinVolume *from_hg =
         (ccl_private const HenyeyGreensteinVolume *)from_sc;
 
-    if (from_sc->type == CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID) {
+    if (CLOSURE_IS_VOLUME_SCATTER(from_sc->type)) {
       ccl_private ShaderVolumeClosure *to_sc = &phases->closure[phases->num_closure];
 
       to_sc->weight = from_sc->weight;
+      to_sc->type = from_sc->type;
       to_sc->sample_weight = from_sc->sample_weight;
       to_sc->g = from_hg->g;
       phases->num_closure++;
@@ -675,11 +676,12 @@ ccl_device_inline float _shader_volume_phase_multi_eval(
       continue;
 
     ccl_private const ShaderVolumeClosure *svc = &phases->closure[i];
+    // printf("%d", (int) svc->type);
     float phase_pdf = 0.0f;
     float3 eval = volume_phase_eval(sd, svc, omega_in, &phase_pdf);
 
     if (phase_pdf != 0.0f) {
-      bsdf_eval_accum(result_eval, CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID, eval);
+      bsdf_eval_accum(result_eval, svc->type, eval);
       sum_pdf += phase_pdf * svc->sample_weight;
     }
 
@@ -753,7 +755,7 @@ ccl_device int shader_volume_phase_sample(KernelGlobals kg,
   label = volume_phase_sample(sd, svc, randu, randv, &eval, omega_in, domega_in, pdf);
 
   if (*pdf != 0.0f) {
-    bsdf_eval_init(phase_eval, CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID, eval);
+    bsdf_eval_init(phase_eval, svc->type, eval);
   }
 
   return label;
