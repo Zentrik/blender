@@ -1823,7 +1823,7 @@ enum {
 
 enum {
   VOLUME_SCATTER_HENYEY = 0,
-  VOLUME_SCATTER_MEI = 1,
+  VOLUME_SCATTER_MIE = 1,
 };
 
 /* blur node */

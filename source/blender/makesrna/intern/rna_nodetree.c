@@ -4712,10 +4712,10 @@ static const EnumPropertyItem node_volume_scatter_method_items[] = {
      0,
      "Henyey-Greenstein",
      "todo"},
-    {VOLUME_SCATTER_MEI,
-     "MEI",
+    {VOLUME_SCATTER_MIE,
+     "MIE",
      0,
-     "Mei",
+     "Mie",
      "todo"},
     {0, NULL, 0, NULL, NULL}};
 
