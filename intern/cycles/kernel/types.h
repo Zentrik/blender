@@ -949,6 +949,7 @@ ShaderDataCausticsStorage;
 
 typedef struct ShaderVolumeClosure {
   float3 weight;
+  ClosureType type;
   float sample_weight;
   float g;
 } ShaderVolumeClosure;
