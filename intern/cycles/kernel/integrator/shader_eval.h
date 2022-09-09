@@ -761,27 +761,31 @@ ccl_device int shader_volume_phase_sample(KernelGlobals kg,
   return label;
 }
 
-ccl_device int shader_phase_sample_closure(KernelGlobals kg,
-                                           ccl_private const ShaderData *sd,
-                                           ccl_private const ShaderVolumeClosure *sc,
-                                           float randu,
-                                           float randv,
-                                           ccl_private BsdfEval *phase_eval,
-                                           ccl_private float3 *omega_in,
-                                           ccl_private differential3 *domega_in,
-                                           ccl_private float *pdf)
-{
-  int label;
-  float3 eval = zero_float3();
+// This is never called?
 
-  *pdf = 0.0f;
-  label = volume_phase_sample(sd, sc, randu, randv, &eval, omega_in, domega_in, pdf);
+// ccl_device int shader_phase_sample_closure(KernelGlobals kg,
+//                                            ccl_private const ShaderData *sd,
+//                                            ccl_private const ShaderVolumeClosure *sc,
+//                                            float randu,
+//                                            float randv,
+//                                            ccl_private BsdfEval *phase_eval,
+//                                            ccl_private float3 *omega_in,
+//                                            ccl_private differential3 *domega_in,
+//                                            ccl_private float *pdf)
+// {
+//   printf("shader_phase_sample_closure called");
 
-  if (*pdf != 0.0f)
-    bsdf_eval_init(phase_eval, CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID, eval);
+//   int label;
+//   float3 eval = zero_float3();
 
-  return label;
-}
+//   *pdf = 0.0f;
+//   label = volume_phase_sample(sd, sc, randu, randv, &eval, omega_in, domega_in, pdf);
+
+//   if (*pdf != 0.0f)
+//     bsdf_eval_init(phase_eval, CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID, eval);
+
+//   return label;
+// }
 
 /* Volume Evaluation */
 
