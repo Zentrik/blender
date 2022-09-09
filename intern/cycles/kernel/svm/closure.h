@@ -985,16 +985,16 @@ ccl_device_noinline void svm_node_closure_volume(KernelGlobals kg,
   weight *= density;
 
   /* Add closure for volume scattering. */
-  if (type == CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID || type == CLOSURE_VOLUME_MEI_ID || type == CLOSURE_VOLUME_RAYLEIGH_ID) {
-    ccl_private HenyeyGreensteinVolume *volume = (ccl_private HenyeyGreensteinVolume *)bsdf_alloc(
-        sd, sizeof(HenyeyGreensteinVolume), weight);
+  if (CLOSURE_IS_VOLUME_SCATTER(type)) {
+    ccl_private VolumeScatter *volume = (ccl_private VolumeScatter *)bsdf_alloc(
+        sd, sizeof(VolumeScatter), weight);
 
     if (volume) {
       float anisotropy = (stack_valid(anisotropy_offset)) ?
                              stack_load_float(stack, anisotropy_offset) :
                              __uint_as_float(node.w);
       volume->g = anisotropy; /* g */
-      sd->flag |= volume_henyey_greenstein_setup(volume);
+      sd->flag |= volume_setup(volume, (ClosureType) type);
     }
   }
 
@@ -1055,14 +1055,15 @@ ccl_device_noinline int svm_node_principled_volume(KernelGlobals kg,
     }
 
     /* Add closure for volume scattering. */
-    ccl_private HenyeyGreensteinVolume *volume = (ccl_private HenyeyGreensteinVolume *)bsdf_alloc(
-        sd, sizeof(HenyeyGreensteinVolume), color * density);
+    ccl_private VolumeScatter *volume = (ccl_private VolumeScatter *)bsdf_alloc(
+        sd, sizeof(VolumeScatter), color * density);
+
     if (volume) {
       float anisotropy = (stack_valid(anisotropy_offset)) ?
-                             stack_load_float(stack, anisotropy_offset) :
-                             __uint_as_float(value_node.y);
-      volume->g = anisotropy;
-      sd->flag |= volume_henyey_greenstein_setup(volume);
+                              stack_load_float(stack, anisotropy_offset) :
+                              __uint_as_float(value_node.y);
+      volume->g = anisotropy; /* g */
+      sd->flag |= volume_setup(volume, CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID);
     }
 
     /* Add extinction weight. */

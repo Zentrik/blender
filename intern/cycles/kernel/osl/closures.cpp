@@ -975,19 +975,19 @@ CCLOSURE_PREPARE(closure_absorption_prepare, VolumeAbsorptionClosure)
 
 class VolumeHenyeyGreensteinClosure : public CBSDFClosure {
  public:
-  HenyeyGreensteinVolume params;
+  VolumeScatter params;
 
   void setup(ShaderData *sd, uint32_t path_flag, float3 weight)
   {
     volume_extinction_setup(sd, weight);
 
-    HenyeyGreensteinVolume *volume = (HenyeyGreensteinVolume *)bsdf_alloc_osl(
-        sd, sizeof(HenyeyGreensteinVolume), weight, &params);
+    VolumeScatter *volume = (VolumeScatter *)bsdf_alloc_osl(
+        sd, sizeof(VolumeScatter), weight, &params);
     if (!volume) {
       return;
     }
 
-    sd->flag |= volume_henyey_greenstein_setup(volume);
+    sd->flag |= volume_setup(volume, CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID);
   }
 };
 
