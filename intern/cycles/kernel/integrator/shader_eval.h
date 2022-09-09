@@ -673,7 +673,6 @@ ccl_device_inline float _shader_volume_phase_multi_eval(
       continue;
 
     ccl_private const ShaderVolumeClosure *svc = &phases->closure[i];
-    // printf("%d", (int) svc->type);
     float phase_pdf = 0.0f;
     float3 eval = volume_phase_eval(sd, svc, omega_in, &phase_pdf);
 
@@ -758,31 +757,27 @@ ccl_device int shader_volume_phase_sample(KernelGlobals kg,
   return label;
 }
 
-// This is never called?
+ccl_device int shader_phase_sample_closure(KernelGlobals kg,
+                                           ccl_private const ShaderData *sd,
+                                           ccl_private const ShaderVolumeClosure *sc,
+                                           float randu,
+                                           float randv,
+                                           ccl_private BsdfEval *phase_eval,
+                                           ccl_private float3 *omega_in,
+                                           ccl_private differential3 *domega_in,
+                                           ccl_private float *pdf)
+{
+  int label;
+  float3 eval = zero_float3();
 
-// ccl_device int shader_phase_sample_closure(KernelGlobals kg,
-//                                            ccl_private const ShaderData *sd,
-//                                            ccl_private const ShaderVolumeClosure *sc,
-//                                            float randu,
-//                                            float randv,
-//                                            ccl_private BsdfEval *phase_eval,
-//                                            ccl_private float3 *omega_in,
-//                                            ccl_private differential3 *domega_in,
-//                                            ccl_private float *pdf)
-// {
-//   printf("shader_phase_sample_closure called");
+  *pdf = 0.0f;
+  label = volume_phase_sample(sd, sc, randu, randv, &eval, omega_in, domega_in, pdf);
 
-//   int label;
-//   float3 eval = zero_float3();
+  if (*pdf != 0.0f)
+    bsdf_eval_init(phase_eval, CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID, eval);
 
-//   *pdf = 0.0f;
-//   label = volume_phase_sample(sd, sc, randu, randv, &eval, omega_in, domega_in, pdf);
-
-//   if (*pdf != 0.0f)
-//     bsdf_eval_init(phase_eval, CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID, eval);
-
-//   return label;
-// }
+  return label;
+}
 
 /* Volume Evaluation */
 

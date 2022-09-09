@@ -1063,8 +1063,8 @@ ccl_device_noinline int svm_node_principled_volume(KernelGlobals kg,
                               stack_load_float(stack, anisotropy_offset) :
                               __uint_as_float(value_node.y);
       volume->g = anisotropy; /* g */
-      ClosureType phase_function = CLOSURE_VOLUME_RAYLEIGH_ID;  // (ClosureType) node.z;
-      sd->flag |= volume_setup(volume, phase_function);
+      // ClosureType phase_function = (ClosureType) node.z;
+      sd->flag |= volume_setup(volume, CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID);
     }
 
     /* Add extinction weight. */

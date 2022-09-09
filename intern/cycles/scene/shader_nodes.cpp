@@ -3289,7 +3289,7 @@ void AmbientOcclusionNode::compile(OSLCompiler &compiler)
 
 VolumeNode::VolumeNode(const NodeType *node_type) : ShaderNode(node_type)
 {
-  closure = CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID; // VOLUME_SPECIAL_TYPE_CLOSURE
+  closure = CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID;
 }
 
 void VolumeNode::compile(SVMCompiler &compiler, ShaderInput *param1, ShaderInput *param2)
@@ -3364,8 +3364,7 @@ NODE_DEFINE(ScatterVolumeNode)
 
   static NodeEnum phase_function_enum;
   phase_function_enum.insert("henyey", CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID);
-  phase_function_enum.insert("rayleigh", CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID);
-  phase_function_enum.insert("mie", CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID);
+  phase_function_enum.insert("mie", CLOSURE_VOLUME_MIE_ID);
   SOCKET_ENUM(phase_function, "Phase Function", phase_function_enum, CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID);
 
   SOCKET_OUT_CLOSURE(volume, "Volume");

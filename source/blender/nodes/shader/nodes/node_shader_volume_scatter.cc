@@ -31,12 +31,6 @@ static void node_shader_init_volume_scatter(bNodeTree *UNUSED(ntree), bNode *nod
   node->custom1 = VOLUME_SCATTER_HENYEY;
 }
 
-static void node_shader_update_volume_scatter(bNodeTree *ntree, bNode *node)
-{
-  bNodeSocket *sock_anisotropy = nodeFindSocket(node, SOCK_IN, "Anisotropy");
-  nodeSetSocketAvailability(ntree, sock_anisotropy, ELEM(node->custom1, VOLUME_SCATTER_HENYEY, VOLUME_SCATTER_MEI));
-}
-
 static int node_shader_gpu_volume_scatter(GPUMaterial *mat,
                                           bNode *node,
                                           bNodeExecData *UNUSED(execdata),
@@ -60,7 +54,6 @@ void register_node_type_sh_volume_scatter()
   ntype.draw_buttons = file_ns::node_shader_buts_volume_scatter;
   node_type_init(&ntype, file_ns::node_shader_init_volume_scatter);
   node_type_gpu(&ntype, file_ns::node_shader_gpu_volume_scatter);
-  node_type_update(&ntype, file_ns::node_shader_update_volume_scatter);
 
   nodeRegisterType(&ntype);
 }
