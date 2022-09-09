@@ -116,6 +116,95 @@ ccl_device int volume_henyey_greenstein_sample(ccl_private const ShaderVolumeClo
   return LABEL_VOLUME_SCATTER;
 }
 
+/* MEI CLOSURE */
+
+/* Given cosine between rays, return probability density that a photon bounces
+ * to that direction. The g parameter controls how different it is from the
+ * uniform sphere. g=0 uniform diffuse-like, g=1 close to sharp single ray. */
+ccl_device float mei(float cos_theta, float g)
+{
+  return ((1.0f - g * g) * (1 + cos_theta * cos_theta) / safe_powf(1.0f + g * g - 2.0f * g * cos_theta, 1.5f)) / (2.0f + g * g) * (M_1_PI_F * 0.375f);
+};
+
+
+ccl_device float3 volume_mei_eval_phase(ccl_private const ShaderVolumeClosure *svc,
+                                        const float3 I,
+                                        float3 omega_in,
+                                        ccl_private float *pdf)
+{
+  float g = svc->g;
+
+  /* note that I points towards the viewer */
+  float cos_theta = dot(-I, omega_in);
+  if (fabsf(g) < 1e-3f) {
+    *pdf = M_1_PI_F * 0.1875f * (1 + cos_theta * cos_theta);
+  }
+  else {
+    *pdf = mei(cos_theta, g);
+  }
+
+  return make_float3(*pdf, *pdf, *pdf);
+}
+
+ccl_device float3
+mei_sample(float3 D, float g, float randu, float randv, ccl_private float *pdf)
+{
+  /* match pdf for small g */
+  float cos_theta;
+  bool isotropic = fabsf(g) < 1e-3f;
+
+  if (isotropic) {
+    cos_theta = (1.0f - 2.0f * randu);
+    if (pdf) {
+      *pdf = M_1_PI_F * 0.1875f * (1 + cos_theta * cos_theta);
+    }
+  }
+  else {
+    float k = (1.0f - g * g) / (1.0f - g + 2.0f * g * randu);
+    cos_theta = (1.0f + g * g - k * k) / (2.0f * g);
+    if (pdf) {
+      *pdf = mei(cos_theta, g);
+    }
+  }
+
+  float sin_theta = safe_sqrtf(1.0f - cos_theta * cos_theta);
+  float phi = M_2PI_F * randv;
+  float3 dir = make_float3(sin_theta * cosf(phi), sin_theta * sinf(phi), cos_theta);
+
+  float3 T, B;
+  make_orthonormals(D, &T, &B);
+  dir = dir.x * T + dir.y * B + dir.z * D;
+
+  return dir;
+}
+
+ccl_device int volume_mei_sample(ccl_private const ShaderVolumeClosure *svc,
+                                               float3 I,
+                                               float3 dIdx,
+                                               float3 dIdy,
+                                               float randu,
+                                               float randv,
+                                               ccl_private float3 *eval,
+                                               ccl_private float3 *omega_in,
+                                               ccl_private float3 *domega_in_dx,
+                                               ccl_private float3 *domega_in_dy,
+                                               ccl_private float *pdf)
+{
+  float g = svc->g;
+
+  /* note that I points towards the viewer and so is used negated */
+  *omega_in = mei_sample(-I, g, randu, randv, pdf);
+  *eval = make_float3(*pdf, *pdf, *pdf); /* perfect importance sampling */
+
+#ifdef __RAY_DIFFERENTIALS__
+  /* todo: implement ray differential estimation */
+  *domega_in_dx = make_float3(0.0f, 0.0f, 0.0f);
+  *domega_in_dy = make_float3(0.0f, 0.0f, 0.0f);
+#endif
+
+  return LABEL_VOLUME_SCATTER;
+}
+
 /* RAYLEIGH CLOSURE */
 
 /* Given cosine between rays, return probability density that a photon bounces
@@ -205,7 +294,7 @@ ccl_device float3 volume_phase_eval(ccl_private const ShaderData *sd,
         eval = volume_henyey_greenstein_eval_phase(svc, sd->I, omega_in, pdf);
         break;
       case CLOSURE_VOLUME_MEI_ID:
-        eval = volume_henyey_greenstein_eval_phase(svc, sd->I, omega_in, pdf);
+        eval = volume_mei_eval_phase(svc, sd->I, omega_in, pdf);
         break;
       case CLOSURE_VOLUME_RAYLEIGH_ID:
         eval = volume_rayleigh_eval_phase(svc, sd->I, omega_in, pdf);
@@ -244,17 +333,17 @@ ccl_device int volume_phase_sample(ccl_private const ShaderData *sd,
                                               pdf);
       break;
     case CLOSURE_VOLUME_MEI_ID:
-      label = volume_henyey_greenstein_sample(svc,
-                                              sd->I,
-                                              sd->dI.dx,
-                                              sd->dI.dy,
-                                              randu,
-                                              randv,
-                                              eval,
-                                              omega_in,
-                                              &domega_in->dx,
-                                              &domega_in->dy,
-                                              pdf);
+      label = volume_mei_sample(svc,
+                                sd->I,
+                                sd->dI.dx,
+                                sd->dI.dy,
+                                randu,
+                                randv,
+                                eval,
+                                omega_in,
+                                &domega_in->dx,
+                                &domega_in->dy,
+                                pdf);
       break;
     case CLOSURE_VOLUME_RAYLEIGH_ID:
       label = volume_rayleigh_sample(svc,
