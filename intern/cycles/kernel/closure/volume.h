@@ -122,7 +122,7 @@ ccl_device int volume_henyey_greenstein_sample(ccl_private const ShaderVolumeClo
  * to that direction. */
 ccl_device float rayleigh(float cos_theta)
 {
-  return M_1_PI_F * 0.25f; // (1.0f + cos_theta * cos_theta) * (M_1_PI_F * 0.1875f);
+  return (1.0f + cos_theta * cos_theta) * (M_1_PI_F * 0.1875f);
 };
 
 ccl_device float3 volume_rayleigh_eval_phase(ccl_private const ShaderVolumeClosure *svc,
@@ -185,7 +185,7 @@ ccl_device int volume_rayleigh_sample(ccl_private const ShaderVolumeClosure *svc
 
 ccl_device int volume_setup(ccl_private VolumeScatter *volume, const ClosureType type)
 {
-  volume->type = CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID;  // type;
+  volume->type = type; //CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID;
 
   /* clamp anisotropy to avoid delta function */
   volume->g = signf(volume->g) * min(fabsf(volume->g), 1.0f - 1e-3f);

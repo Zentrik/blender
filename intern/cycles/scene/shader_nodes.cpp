@@ -3289,7 +3289,7 @@ void AmbientOcclusionNode::compile(OSLCompiler &compiler)
 
 VolumeNode::VolumeNode(const NodeType *node_type) : ShaderNode(node_type)
 {
-  closure = CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID;
+  closure = CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID; // VOLUME_SPECIAL_TYPE_CLOSURE
 }
 
 void VolumeNode::compile(SVMCompiler &compiler, ShaderInput *param1, ShaderInput *param2)
