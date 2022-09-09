@@ -28,7 +28,7 @@ static void node_shader_buts_volume_scatter(uiLayout *layout, bContext *UNUSED(C
 
 static void node_shader_init_volume_scatter(bNodeTree *UNUSED(ntree), bNode *node)
 {
-  node->custom1 = VOLUME_SCATTER_HENYEY;
+  node->custom1 = VOLUME_SCATTER_HENYEY_GREENSTEIN;
 }
 
 static int node_shader_gpu_volume_scatter(GPUMaterial *mat,

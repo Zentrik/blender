@@ -3363,7 +3363,7 @@ NODE_DEFINE(ScatterVolumeNode)
   SOCKET_IN_FLOAT(volume_mix_weight, "VolumeMixWeight", 0.0f, SocketType::SVM_INTERNAL);
 
   static NodeEnum phase_function_enum;
-  phase_function_enum.insert("henyey", CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID);
+  phase_function_enum.insert("henyey_greenstein", CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID);
   phase_function_enum.insert("mie", CLOSURE_VOLUME_MIE_ID);
   SOCKET_ENUM(phase_function, "Phase Function", phase_function_enum, CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID);
 

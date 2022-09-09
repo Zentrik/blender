@@ -4707,8 +4707,8 @@ static const EnumPropertyItem node_subsurface_method_items[] = {
     {0, NULL, 0, NULL, NULL}};
 
 static const EnumPropertyItem node_volume_scatter_method_items[] = {
-    {VOLUME_SCATTER_HENYEY,
-     "HENYEY",
+    {VOLUME_SCATTER_HENYEY_GREENSTEIN,
+     "HENYEY_GREENSTEIN",
      0,
      "Henyey-Greenstein",
      "todo"},

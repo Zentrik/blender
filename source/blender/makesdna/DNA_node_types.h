@@ -1822,7 +1822,7 @@ enum {
 /* Volume Scatter. */
 
 enum {
-  VOLUME_SCATTER_HENYEY = 0,
+  VOLUME_SCATTER_HENYEY_GREENSTEIN = 0,
   VOLUME_SCATTER_MIE = 1,
 };
 

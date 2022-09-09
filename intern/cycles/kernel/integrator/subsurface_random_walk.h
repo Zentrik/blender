@@ -331,7 +331,7 @@ ccl_device_inline bool subsurface_random_walk(KernelGlobals kg,
         ray.D = newD;
       }
       else {
-        float3 newD = henyey_greenstrein_sample(ray.D, anisotropy, scatter_u, scatter_v, &hg_pdf);
+        float3 newD = henyey_greenstein_sample(ray.D, anisotropy, scatter_u, scatter_v, &hg_pdf);
         cos_theta = dot(newD, N);
         ray.D = newD;
       }

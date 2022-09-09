@@ -1060,9 +1060,9 @@ ccl_device_noinline int svm_node_principled_volume(KernelGlobals kg,
 
     if (volume) {
       float anisotropy = (stack_valid(anisotropy_offset)) ?
-                              stack_load_float(stack, anisotropy_offset) :
-                              __uint_as_float(value_node.y);
-      volume->g = anisotropy; /* g */
+                             stack_load_float(stack, anisotropy_offset) :
+                             __uint_as_float(value_node.y);
+      volume->g = anisotropy;
       // ClosureType phase_function = (ClosureType) node.z;
       sd->flag |= volume_setup(volume, CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID);
     }

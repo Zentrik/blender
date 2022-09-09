@@ -58,7 +58,7 @@ ccl_device float3 volume_henyey_greenstein_eval_phase(ccl_private const ShaderVo
 }
 
 ccl_device float3
-henyey_greenstrein_sample(float3 D, float g, float randu, float randv, ccl_private float *pdf)
+henyey_greenstein_sample(float3 D, float g, float randu, float randv, ccl_private float *pdf)
 {
   /* match pdf for small g */
   float cos_theta;
@@ -87,33 +87,6 @@ henyey_greenstrein_sample(float3 D, float g, float randu, float randv, ccl_priva
   dir = dir.x * T + dir.y * B + dir.z * D;
 
   return dir;
-}
-
-ccl_device int volume_henyey_greenstein_sample(ccl_private const ShaderVolumeClosure *svc,
-                                               float3 I,
-                                               float3 dIdx,
-                                               float3 dIdy,
-                                               float randu,
-                                               float randv,
-                                               ccl_private float3 *eval,
-                                               ccl_private float3 *omega_in,
-                                               ccl_private float3 *domega_in_dx,
-                                               ccl_private float3 *domega_in_dy,
-                                               ccl_private float *pdf)
-{
-  float g = svc->g;
-
-  /* note that I points towards the viewer and so is used negated */
-  *omega_in = henyey_greenstrein_sample(-I, g, randu, randv, pdf);
-  *eval = make_float3(*pdf, *pdf, *pdf); /* perfect importance sampling */
-
-#ifdef __RAY_DIFFERENTIALS__
-  /* todo: implement ray differential estimation */
-  *domega_in_dx = make_float3(0.0f, 0.0f, 0.0f);
-  *domega_in_dy = make_float3(0.0f, 0.0f, 0.0f);
-#endif
-
-  return LABEL_VOLUME_SCATTER;
 }
 
 /* MIE CLOSURE */
@@ -178,33 +151,6 @@ mie_sample(float3 D, float g, float randu, float randv, ccl_private float *pdf)
   return dir;
 }
 
-ccl_device int volume_mie_sample(ccl_private const ShaderVolumeClosure *svc,
-                                               float3 I,
-                                               float3 dIdx,
-                                               float3 dIdy,
-                                               float randu,
-                                               float randv,
-                                               ccl_private float3 *eval,
-                                               ccl_private float3 *omega_in,
-                                               ccl_private float3 *domega_in_dx,
-                                               ccl_private float3 *domega_in_dy,
-                                               ccl_private float *pdf)
-{
-  float g = svc->g;
-
-  /* note that I points towards the viewer and so is used negated */
-  *omega_in = mie_sample(-I, g, randu, randv, pdf);
-  *eval = make_float3(*pdf, *pdf, *pdf); /* perfect importance sampling */
-
-#ifdef __RAY_DIFFERENTIALS__
-  /* todo: implement ray differential estimation */
-  *domega_in_dx = make_float3(0.0f, 0.0f, 0.0f);
-  *domega_in_dy = make_float3(0.0f, 0.0f, 0.0f);
-#endif
-
-  return LABEL_VOLUME_SCATTER;
-}
-
 /* VOLUME CLOSURE */
 
 ccl_device int volume_setup(ccl_private VolumeScatter *volume, const ClosureType type)
@@ -231,9 +177,6 @@ ccl_device float3 volume_phase_eval(ccl_private const ShaderData *sd,
       case CLOSURE_VOLUME_MIE_ID:
         eval = volume_mie_eval_phase(svc, sd->I, omega_in, pdf);
         break;
-      default:
-        eval = make_float3(0.0f, 0.0f, 0.0f);
-        break;
     }
 
     return eval;
@@ -248,43 +191,26 @@ ccl_device int volume_phase_sample(ccl_private const ShaderData *sd,
                                    ccl_private differential3 *domega_in,
                                    ccl_private float *pdf)
 {
-  int label;
+  float g = svc->g;
 
+  /* note that I points towards the viewer and so is used negated */
   switch (svc->type) {
     case CLOSURE_VOLUME_HENYEY_GREENSTEIN_ID:
-      label = volume_henyey_greenstein_sample(svc,
-                                              sd->I,
-                                              sd->dI.dx,
-                                              sd->dI.dy,
-                                              randu,
-                                              randv,
-                                              eval,
-                                              omega_in,
-                                              &domega_in->dx,
-                                              &domega_in->dy,
-                                              pdf);
+      *omega_in = henyey_greenstein_sample(-sd->I, g, randu, randv, pdf);
       break;
     case CLOSURE_VOLUME_MIE_ID:
-      label = volume_mie_sample(svc,
-                                sd->I,
-                                sd->dI.dx,
-                                sd->dI.dy,
-                                randu,
-                                randv,
-                                eval,
-                                omega_in,
-                                &domega_in->dx,
-                                &domega_in->dy,
-                                pdf);
-      break;
-      break;
-    default:
-      *eval = make_float3(0.0f, 0.0f, 0.0f);
-      label = LABEL_NONE;
+      *omega_in = mie_sample(-sd->I, g, randu, randv, pdf);
       break;
   }
+  *eval = make_float3(*pdf, *pdf, *pdf); /* perfect importance sampling */
 
-  return label;
+#ifdef __RAY_DIFFERENTIALS__
+  /* todo: implement ray differential estimation */
+  *(&domega_in->dx) = make_float3(0.0f, 0.0f, 0.0f);
+  *(&domega_in->dy) = make_float3(0.0f, 0.0f, 0.0f);
+#endif
+
+  return LABEL_VOLUME_SCATTER;
 }
 
 /* Volume sampling utilities. */
